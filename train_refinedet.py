@@ -142,7 +142,7 @@ def train():
     arm_conf_loss = 0
     odm_loc_loss = 0
     odm_conf_loss = 0
-    epoch = 0
+    epoch = 2
     print('Loading the dataset...')
 
     epoch_size = len(dataset) // args.batch_size

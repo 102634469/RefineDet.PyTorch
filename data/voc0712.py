@@ -5,6 +5,7 @@ https://github.com/fmassa/vision/blob/voc_dataset/torchvision/datasets/voc.py
 
 Updated by: Ellis Brown, Max deGroot
 """
+#from os.config import HOME
 from .config import HOME
 import os.path as osp
 import sys
@@ -18,11 +19,12 @@ else:
     import xml.etree.ElementTree as ET
 
 VOC_CLASSES = (  # always index 0
-    'aeroplane', 'bicycle', 'bird', 'boat',
-    'bottle', 'bus', 'car', 'cat', 'chair',
-    'cow', 'diningtable', 'dog', 'horse',
-    'motorbike', 'person', 'pottedplant',
-    'sheep', 'sofa', 'train', 'tvmonitor')
+    'plane', 'baseball-diamond', 'bridge', 'ground-track-field', 
+'small-vehicle', 'large-vehicle', 'ship', 
+'tennis-court', 'basketball-court',  
+'storage-tank', 'soccer-ball-field', 
+'roundabout', 'harbor', 
+'swimming-pool', 'helicopter')
 
 # note: if you used our download scripts, this should be right
 VOC_ROOT = osp.join(HOME, "datasets/VOCdevkit/")
@@ -61,7 +63,10 @@ class VOCAnnotationTransform(object):
                 continue
             name = obj.find('name').text.lower().strip()
             bbox = obj.find('bndbox')
-
+            xmin = x0
+            ymin = y0
+            xmax = x3
+            ymax = y3
             pts = ['xmin', 'ymin', 'xmax', 'ymax']
             bndbox = []
             for i, pt in enumerate(pts):
@@ -104,12 +109,14 @@ class VOCDetection(data.Dataset):
         self.target_transform = target_transform
         self.name = dataset_name
         self._annopath = osp.join('%s', 'Annotations', '%s.xml')
-        self._imgpath = osp.join('%s', 'JPEGImages', '%s.jpg')
+        self._imgpath = osp.join('%s', 'JPEGImages', '%s.png')
         self.ids = list()
         for (year, name) in image_sets:
-            rootpath = osp.join(self.root, 'VOC' + year)
+            #rootpath = osp.join(self.root, 'VOC' + year)
+            rootpath = '/fred/oz138/COS80028/P2/pruthviraj/RefineDet.PyTorch/data/datasets/VOCdevkit/VOC2007'
             for line in open(osp.join(rootpath, 'ImageSets', 'Main', name + '.txt')):
                 self.ids.append((rootpath, line.strip()))
+
 
     def __getitem__(self, index):
         im, gt, h, w = self.pull_item(index)
@@ -123,7 +130,7 @@ class VOCDetection(data.Dataset):
         img_id = self.ids[index]
 
         target = ET.parse(self._annopath % img_id).getroot()
-        img = cv2.imread(self._imgpath % img_id)
+        img = cv2.imread(self._imgpath % img_id)	 
         height, width, channels = img.shape
 
         if self.target_transform is not None:
